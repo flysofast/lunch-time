@@ -1,0 +1,10 @@
+<div class="restaurant col-md-6 mt-3">
+    <span class="restauran-header"><%= name %></span> <br/>
+    <%if data && data.length > 0%>
+        <% data.each do |item| %>
+            <%= render partial: "item", locals: { item: item } %>
+        <% end %>
+    <% else %>
+    <div class="out-of-service"><span class="message">OUT OF SERVICE / NOT READY TO BE SHOWN</span></div>
+    <% end %>
+</div>
