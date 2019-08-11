@@ -5,6 +5,9 @@
     text-align: center;
     .restaurant{
         background-color: #f5f5f5;
+        .restauran-header{
+            font-size: 3em;
+        }
         .item{
             text-align: left;
             border-bottom-color: gray;
@@ -16,6 +19,12 @@
             }
             .title_en{
                 font-size: 1.1em;
+                font-style: italic;
+                color: gray;
+            }
+
+            .category_en{
+                font-size: 0.9em;
                 font-style: italic;
                 color: gray;
             }
@@ -31,7 +40,13 @@
                 height: 300px;
                 display: block;
                 color: #ada9a9;
-                line-height: 300px;
+                position: relative;
+                span.message{
+                    position: absolute;
+                    width: 100%;
+                    top: 0;
+                    left: 0
+                }
             }
 
     
