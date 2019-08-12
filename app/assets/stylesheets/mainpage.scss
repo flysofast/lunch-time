@@ -14,14 +14,16 @@
         }
 
         .category {
-            .title_en {
+            > .title_en {
                 font-size: 1.2em;
                 font-style: italic;
                 color: gray;
+                text-transform: uppercase;
             }
 
-            .title_fi {
+            > .title_fi {
                 font-size: 1.4em;
+                text-transform: uppercase;
             }
 
             border-bottom-color: gray;
