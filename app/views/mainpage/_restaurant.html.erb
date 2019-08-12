@@ -4,14 +4,19 @@
 
     <%if data[:menu] && data[:menu].length > 0%>
         <% data[:menu].each do |category| %>
-            <div class="category <%= category['price'] =~ /^4,95/ ? 'special-meal' : '' %>">
-                <span class="title_fi"> <%= category["category_fi"] %> </span> - <span class="price"> <%= category["price"] %> </span><br/>
+            <div class="category <%= category['price'] =~ /^(4,95|4.95)/ ? 'special-meal' : '' %>">
+                <span class="title_fi"> <%= (category["category_fi"] || "").html_safe %> </span> 
+                <% if category["price"] %>
+                    - <span class="price"> <%= category["price"] %> </span><br/>
+                <% end %>
             <% if category["category_en"] %>
                 <span class="title_en"> <%= category["category_en"] %> </span><br/>
             <% end %>
-            <% category["meals"].each do |item| %>
+                <div class="row">
+            <% category["items"].each do |item| %>
                 <%= render partial: "item", locals: { item: item } %>
             <% end %>
+                </div>
             </div>
 
         <% end %>

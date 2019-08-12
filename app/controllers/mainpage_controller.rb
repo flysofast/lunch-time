@@ -1,21 +1,19 @@
 require 'net/http'
 require 'json'
 require 'date'
-require 'open-uri'
 class MainpageController < ApplicationController
   def index
     @day_shift = params[:day_shift].to_i || 0
     # @language = params[:language] || 'fi'
     @date = DateTime.now + @day_shift
-    
     @all_menus = []
     @all_menus.push(get_reaktori_menu)
     @all_menus.push(get_hertsi_menu)
-    @all_menus.push(get_saas_menu)
+    @all_menus.push(get_juvenes_menu(60038, [77, 3]))
+    @all_menus.push(get_juvenes_menu(6, [60, 86]))
 
     # @json = res.body
-    rescue => e
-      puts "failed #{e}"
+    
   end
 
   def get_hertsi_menu
@@ -24,12 +22,15 @@ class MainpageController < ApplicationController
     menu = get_json_data(uri_string)["courses"]
     c_menu = menu.group_by{|h| [h.delete("category"), h.delete("price")]}
     menu = []
-    c_menu.each do |(category, price), meals|
-      c = {"category_fi" => category, "price" => price, "meals" => meals}
+    c_menu.each do |(category, price), items|
+      c = {"category_fi" => category, "price" => price, "items" => items}
       menu.push(c)
     end
 
     return {:name => "Hertsi", :menu => menu}
+
+    rescue => e
+      return {:name => "Hertsi", :menu => []}
   end
 
   def get_reaktori_menu
@@ -41,34 +42,77 @@ class MainpageController < ApplicationController
     
     menu = []
     data_fi["LunchMenu"]["SetMenus"].each_with_index do |category, ci|
+      if category["Meals"].length == 0
+        next
+      end
       c_hash = {}
       c_hash["category_en"] = data_en["LunchMenu"]["SetMenus"][ci]["Name"]
       c_hash["category_fi"] = category["Name"]
       c_hash["price"] = category["Price"]
-      c_hash["meals"] = []
+      c_hash["items"] = []
 
       category["Meals"].each_with_index do |meal, ii|
         item = {}
         item["title_fi"] = meal["Name"]
         item["title_en"] = data_en["LunchMenu"]["SetMenus"][ci]["Meals"][ii]["Name"]
         item["properties"] = meal["Diets"].join(", ")
-        c_hash["meals"].push(item)
+        c_hash["items"].push(item)
       end
       menu.push(c_hash)
-
     end
     return  {:name => "Reaktori", :menu => menu}
+
+    rescue => e
+      return {:name => "Reaktori", :menu => []}
   end
 
-  def get_saas_menu
-    week_num = @date.strftime("%V")
-    dow_num = @date.wday == 0 ?  7 : @date.wday
-    
-    uri_string_en = "https://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday?KitchenId=60038&MenuTypeId=3&Week=#{week_num}&Weekday=#{dow_num}&lang=%27en%27&format=json"
-    uri_string_fi = "https://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday?KitchenId=60038&MenuTypeId=3&Week=#{week_num}&Weekday=#{dow_num}&lang=%27fi%27&format=json"
-    data_en = JSON.parse(get_json_data(uri_string_en)["d"])
-    data_fi = JSON.parse(get_json_data(uri_string_fi)["d"])
-    byebug
+  def get_juvenes_menu (kitchenId, menu_type_ids)
+    begin
+      week_num = @date.strftime("%V")
+      dow_num = @date.wday == 0 ?  7 : @date.wday
+
+      menu_types_data = []
+      menu_type_ids.each do |id|
+        uri = "https://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday?KitchenId=#{kitchenId}&MenuTypeId=#{id}&Week=#{week_num}&Weekday=#{dow_num}&lang=%27en%27&format=json"
+        menu_data = JSON.parse(get_json_data(uri)["d"])
+        menu_types_data.push(menu_data)
+      end
+
+      menu = []
+      menu_types_data.each_with_index do |data, index|
+        menu.push({"category_fi" => "<br/> <strong>#{data["MenuTypeName"]}'s menu</strong> <br/>", "items" => []})
+        begin
+          data["MealOptions"].each do |category|
+            if category["Name_FI"].empty?
+              next
+            end
+            c_hash = {}
+            c_hash["category_en"] = category["Name_EN"]
+            c_hash["category_fi"] = category["Name_FI"]
+            c_hash["price"] = (index == 0 || category["Name_FI"] == "PANINIATERIA") ? "2,60/ 5,60/ 7,80€" : "4,95/ 8,50/ 9,40€"
+            c_hash["items"] = []
+            category["MenuItems"].each_with_index do |menu_item|
+              if menu_item["Name_FI"].empty?
+                next
+              end
+              item = {}
+              item["title_fi"] = menu_item["Name_FI"]
+              item["title_en"] = menu_item["Name_EN"]
+              item["ingredients"] = menu_item["Ingredients"]
+              item["properties"] = menu_item["Diets"]
+              c_hash["items"].push(item)
+            end
+            menu.push(c_hash)
+          end
+        rescue
+        end
+      end
+      return {:name => menu_types_data[0]["KitchenName"], :menu => menu}
+
+    rescue => e
+      return {:name => menu_types_data.length > 0 ? (menu_types_data[0]["KitchenName"] || "Juvenes") : "Juvenes" , :menu => []}
+      puts e
+    end
   end
 
   def get_json_data (uri_string)

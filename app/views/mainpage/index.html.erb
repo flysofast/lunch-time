@@ -1,14 +1,13 @@
 <div class="container">
-    <h1>Test page</h1>
+    <h1>Menu</h1>
     <h3> <%= @date.strftime("%a, %d/%m") %> </h3>
     <%= link_to "Previous day", index_path(day_shift: @day_shift - 1), :class => "btn btn-primary" %>
     <%= link_to "Next day", index_path(day_shift: @day_shift + 1), :class => "btn btn-primary"  %>
 
     <div class="row">
-         <% @all_menus.each do |restaurant| %>
+        <% @all_menus.each do |restaurant| %>
             <%= render partial: "restaurant", locals: { data: restaurant } %>
-         <% end %>
-        <%# <%= render partial: "restaurant", locals: { data: @reaktori_data} %> %>
+        <% end %>
     </div>
 </div>
 
