@@ -1,53 +1,69 @@
 // Place all the styles related to the Mainpage controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
-.container{
+.container {
     text-align: center;
-    .restaurant{
+
+    .restaurant {
         background-color: #f5f5f5;
-        .restauran-header{
+
+        .restauran-header {
             font-size: 3em;
         }
-        .item{
-            text-align: left;
+
+        .category {
+            .title_en {
+                font-size: 1.2em;
+                font-style: italic;
+                color: gray;
+            }
+
+            .title_fi {
+                font-size: 1.4em;
+            }
+
             border-bottom-color: gray;
             border-bottom-style: solid;
             border-bottom-width: 1px;
+        }
+
+        .item {
+            text-align: left;
+
             padding: 1em;
-            .title_fi{
+
+            .title_fi {
                 font-size: 1.2em;
             }
-            .title_en{
+
+            .title_en {
                 font-size: 1.1em;
                 font-style: italic;
                 color: gray;
             }
-
-            .category_en{
-                font-size: 0.9em;
-                font-style: italic;
-                color: gray;
-            }
         }
-        .special-meal{
+
+        .special-meal {
             background-color: #fffc7a2e;
         }
 
     }
-            .out-of-service{
-                // background-color: #8080805c;
-                font-size: 2em;
-                height: 300px;
-                display: block;
-                color: #ada9a9;
-                position: relative;
-                span.message{
-                    position: absolute;
-                    width: 100%;
-                    top: 0;
-                    left: 0
-                }
-            }
 
-    
+    .out-of-service {
+        // background-color: #8080805c;
+        font-size: 2em;
+        height: 300px;
+        display: block;
+        color: #ada9a9;
+        position: relative;
+
+        span.message {
+            position: absolute;
+            width: 100%;
+            top: 0;
+            left: 0
+        }
+    }
+
+
 }

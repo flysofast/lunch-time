@@ -8,8 +8,11 @@ class MainpageController < ApplicationController
     # @language = params[:language] || 'fi'
     @date = DateTime.now + @day_shift
     
-    @sodexo_data = get_hertsi_menu
-    @reaktori_data = get_reaktori_menu
+    @all_menus = []
+    @all_menus.push(get_reaktori_menu)
+    @all_menus.push(get_hertsi_menu)
+    @all_menus.push(get_saas_menu)
+
     # @json = res.body
     rescue => e
       puts "failed #{e}"
@@ -18,7 +21,15 @@ class MainpageController < ApplicationController
   def get_hertsi_menu
     date_string = @date.strftime("%Y/%m/%d")
     uri_string = "https://www.sodexo.fi/ruokalistat/output/daily_json/12812/#{date_string}/fi"
-    return get_json_data(uri_string)["courses"]
+    menu = get_json_data(uri_string)["courses"]
+    c_menu = menu.group_by{|h| [h.delete("category"), h.delete("price")]}
+    menu = []
+    c_menu.each do |(category, price), meals|
+      c = {"category_fi" => category, "price" => price, "meals" => meals}
+      menu.push(c)
+    end
+
+    return {:name => "Hertsi", :menu => menu}
   end
 
   def get_reaktori_menu
@@ -30,18 +41,34 @@ class MainpageController < ApplicationController
     
     menu = []
     data_fi["LunchMenu"]["SetMenus"].each_with_index do |category, ci|
+      c_hash = {}
+      c_hash["category_en"] = data_en["LunchMenu"]["SetMenus"][ci]["Name"]
+      c_hash["category_fi"] = category["Name"]
+      c_hash["price"] = category["Price"]
+      c_hash["meals"] = []
+
       category["Meals"].each_with_index do |meal, ii|
         item = {}
-        item["category"] = category["Name"]
-        item["category_en"] =  data_en["LunchMenu"]["SetMenus"][ci]["Name"]
-        item["price"] = category["Price"]
         item["title_fi"] = meal["Name"]
         item["title_en"] = data_en["LunchMenu"]["SetMenus"][ci]["Meals"][ii]["Name"]
         item["properties"] = meal["Diets"].join(", ")
-        menu.push(item)
+        c_hash["meals"].push(item)
       end
+      menu.push(c_hash)
+
     end
-    return menu
+    return  {:name => "Reaktori", :menu => menu}
+  end
+
+  def get_saas_menu
+    week_num = @date.strftime("%V")
+    dow_num = @date.wday == 0 ?  7 : @date.wday
+    
+    uri_string_en = "https://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday?KitchenId=60038&MenuTypeId=3&Week=#{week_num}&Weekday=#{dow_num}&lang=%27en%27&format=json"
+    uri_string_fi = "https://www.juvenes.fi/DesktopModules/Talents.LunchMenu/LunchMenuServices.asmx/GetMenuByWeekday?KitchenId=60038&MenuTypeId=3&Week=#{week_num}&Weekday=#{dow_num}&lang=%27fi%27&format=json"
+    data_en = JSON.parse(get_json_data(uri_string_en)["d"])
+    data_fi = JSON.parse(get_json_data(uri_string_fi)["d"])
+    byebug
   end
 
   def get_json_data (uri_string)

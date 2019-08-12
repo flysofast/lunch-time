@@ -1,8 +1,5 @@
-<div class="item <%= item['price'] =~ /^4,95/ ? 'special-meal' : '' %>">
+<div class="item">
     <span class="title_fi"> <%= item["title_fi"] %> </span><br/>
     <span class="title_en"> <%= item["title_en"] %> </span> <br/>
-    <span class="price"> <%= item["price"] %> </span><br/>
     <span class="properties"> <%= item["properties"] %> </span><br/>
-    <span class="category"> <%= item["category"] %> </span>
-    <span class="category_en"> <%= item["category_en"] %> </span><br/>
 </div>

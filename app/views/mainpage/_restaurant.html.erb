@@ -1,8 +1,19 @@
 <div class="restaurant col-md-6 mt-3">
-    <span class="restauran-header"><%= name %></span> <br/>
-    <%if data && data.length > 0%>
-        <% data.each do |item| %>
-            <%= render partial: "item", locals: { item: item } %>
+
+    <span class="restauran-header"><%= data[:name] %></span> <br/>
+
+    <%if data[:menu] && data[:menu].length > 0%>
+        <% data[:menu].each do |category| %>
+            <div class="category <%= category['price'] =~ /^4,95/ ? 'special-meal' : '' %>">
+                <span class="title_fi"> <%= category["category_fi"] %> </span> - <span class="price"> <%= category["price"] %> </span><br/>
+            <% if category["category_en"] %>
+                <span class="title_en"> <%= category["category_en"] %> </span><br/>
+            <% end %>
+            <% category["meals"].each do |item| %>
+                <%= render partial: "item", locals: { item: item } %>
+            <% end %>
+            </div>
+
         <% end %>
     <% else %>
     <div class="out-of-service"><span class="message">OUT OF SERVICE / NOT READY TO BE SHOWN</span></div>
