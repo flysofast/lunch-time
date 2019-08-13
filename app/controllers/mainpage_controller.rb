@@ -26,10 +26,9 @@ class MainpageController < ApplicationController
       c = {"category_fi" => category, "price" => price, "items" => items}
       menu.push(c)
     end
-
     return {:name => "Hertsi", :menu => menu}
-
     rescue => e
+      logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
       return {:name => "Hertsi", :menu => []}
   end
 
@@ -63,6 +62,7 @@ class MainpageController < ApplicationController
     return  {:name => "Reaktori", :menu => menu}
 
     rescue => e
+      logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
       return {:name => "Reaktori", :menu => []}
   end
 
@@ -104,14 +104,15 @@ class MainpageController < ApplicationController
             end
             menu.push(c_hash)
           end
-        rescue
+        rescue => e
+          logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
         end
       end
       return {:name => menu_types_data[0]["KitchenName"], :menu => menu}
 
     rescue => e
+      logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
       return {:name => menu_types_data.length > 0 ? (menu_types_data[0]["KitchenName"] || "Juvenes") : "Juvenes" , :menu => []}
-      puts e
     end
   end
 

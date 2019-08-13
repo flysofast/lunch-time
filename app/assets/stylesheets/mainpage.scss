@@ -1,8 +1,32 @@
 // Place all the styles related to the Mainpage controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+#header {
+    position: sticky;
+    position: -webkit-sticky;
+    top: 0;
+    background: white;
+    text-align: center;
+    padding-bottom: 5px;
+    transition: 0.2s;
+    z-index: 99;
+
+    a {
+        font-size: 1em;
+    }
+
+    h3 {
+        font-size: 1.75em;
+    }
+}
+
+.shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
 .container {
     text-align: center;
+    width: 96% !important;
 
     .restaurant {
         font-size: 0.7em;
@@ -14,14 +38,14 @@
         }
 
         .category {
-            > .title_en {
+            >.title_en {
                 font-size: 1.2em;
                 font-style: italic;
                 color: gray;
                 text-transform: uppercase;
             }
 
-            > .title_fi {
+            >.title_fi {
                 font-size: 1.4em;
                 text-transform: uppercase;
             }
@@ -44,7 +68,8 @@
                 font-style: italic;
                 color: gray;
             }
-            .properties{
+
+            .properties {
                 margin-left: 1em;
                 font-size: 0.8em;
                 color: gray;
