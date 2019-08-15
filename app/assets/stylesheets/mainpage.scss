@@ -78,6 +78,16 @@
         }
 
         .special-meal {
+            >.title_fi {
+                color: red;
+            }
+        }
+
+        .vegeterian-meal{
+            color: green;
+        }
+
+        .normal-meal{
             background-color: #fffc7a2e;
         }
     }
