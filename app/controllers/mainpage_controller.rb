@@ -67,6 +67,7 @@ class MainpageController < ApplicationController
   end
 
   def get_juvenes_menu (kitchenId, menu_type_ids)
+    kitchenName = "Juvenes restaurant"
     begin
       week_num = @date.strftime("%V")
       dow_num = @date.wday == 0 ?  7 : @date.wday
@@ -80,39 +81,42 @@ class MainpageController < ApplicationController
 
       menu = []
       menu_types_data.each_with_index do |data, index|
-        menu.push({"category_fi" => "<br/> <strong>#{data["MenuTypeName"]}'s menu</strong> <br/>", "items" => []})
-        begin
-          data["MealOptions"].each do |category|
-            if category["Name_FI"].empty?
-              next
-            end
-            c_hash = {}
-            c_hash["category_en"] = category["Name_EN"]
-            c_hash["category_fi"] = category["Name_FI"]
-            c_hash["price"] = (index == 0 || category["Name_FI"] == "PANINIATERIA") ? "2,60/ 5,60/ 7,80€" : "4,95/ 8,50/ 9,40€"
-            c_hash["items"] = []
-            category["MenuItems"].each_with_index do |menu_item|
-              if menu_item["Name_FI"].empty?
+        if data["KitchenName"] != "[CLOSED]"
+          kitchenName = data["KitchenName"]
+          menu.push({"category_fi" => "<br/> <strong>#{data["MenuTypeName"]}'s menu</strong> <br/>", "items" => []})
+          begin
+            data["MealOptions"].each do |category|
+              if category["Name_FI"].empty?
                 next
               end
-              item = {}
-              item["title_fi"] = menu_item["Name_FI"]
-              item["title_en"] = menu_item["Name_EN"]
-              item["ingredients"] = menu_item["Ingredients"]
-              item["properties"] = menu_item["Diets"]
-              c_hash["items"].push(item)
-            end
-            menu.push(c_hash)
+              c_hash = {}
+              c_hash["category_en"] = category["Name_EN"]
+              c_hash["category_fi"] = category["Name_FI"]
+              c_hash["price"] = (index == 0 || category["Name_FI"] == "PANINIATERIA") ? "2,60/ 5,60/ 7,80€" : "4,95/ 8,50/ 9,40€"
+              c_hash["items"] = []
+              category["MenuItems"].each_with_index do |menu_item|
+                if menu_item["Name_FI"].empty?
+                  next
+                end
+                item = {}
+                item["title_fi"] = menu_item["Name_FI"]
+                item["title_en"] = menu_item["Name_EN"]
+                item["ingredients"] = menu_item["Ingredients"]
+                item["properties"] = menu_item["Diets"]
+                c_hash["items"].push(item)
+              end
+              menu.push(c_hash)
           end
-        rescue => e
-          logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
+          rescue => e
+            logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
+          end
         end
       end
-      return {:name => menu_types_data[0]["KitchenName"], :menu => menu}
+      return {:name => kitchenName, :menu => menu}
 
     rescue => e
       logger.debug ActiveSupport::LogSubscriber.new.send(:color, e.message, :red )
-      return {:name => menu_types_data.length > 0 ? (menu_types_data[0]["KitchenName"] || "Juvenes") : "Juvenes" , :menu => []}
+      return {:name => kitchenName , :menu => []}
     end
   end
 
