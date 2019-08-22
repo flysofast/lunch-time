@@ -6,7 +6,7 @@ class MainpageController < ApplicationController
     update_view_count
     @day_shift = params[:day_shift].to_i || 0
     # @language = params[:language] || 'fi'
-    @date = DateTime.now + @day_shift
+    @date = DateTime.now.in_time_zone("Helsinki") + @day_shift
     @all_menus = []
     @all_menus.push(get_reaktori_menu)
     @all_menus.push(get_hertsi_menu)
@@ -134,7 +134,7 @@ class MainpageController < ApplicationController
     read_view_count
     today = {'count' => @viewCount['today']['count']} rescue today = {'count' => 0}
     today['count'] = DateTime.parse(@viewCount['last_hit'].to_json).today? ? today['count'] + 1 : 1
-    @viewCount = {'last_hit' => DateTime.now, 'count' =>  @viewCount['count'] +1, 'today' => today }
+    @viewCount = {'last_hit' => DateTime.now.in_time_zone("Helsinki"), 'count' =>  @viewCount['count'] +1, 'today' => today }
     write_view_count
   end
   def write_view_count
@@ -148,7 +148,7 @@ class MainpageController < ApplicationController
         @viewCount = JSON.parse(line)
       end
     rescue 
-      @viewCount = {'last_hit' => DateTime.now, 'count' =>  0, 'today' => {'count' => 0} }
+      @viewCount = {'last_hit' => DateTime.now.in_time_zone("Helsinki"), 'count' =>  0, 'today' => {'count' => 0} }
     end
   end
 
