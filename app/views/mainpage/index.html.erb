@@ -13,6 +13,10 @@
 </div>
 
 <script>
+    $( document ).ready(function() {
+        console.log( "Hey there. Go to https://github.com/flysofast/lunch-time for the full source code.");
+        console.log(JSON.parse('<%= @viewCount.to_json.html_safe %>'))
+    });
     window.onscroll = function scrollFunction() {
         var header = document.getElementById("header");
             if (document.body.scrollTop > 50 || document.documentElement.scrollTop > 50) {

@@ -3,6 +3,7 @@ require 'json'
 require 'date'
 class MainpageController < ApplicationController
   def index
+    update_view_count
     @day_shift = params[:day_shift].to_i || 0
     # @language = params[:language] || 'fi'
     @date = DateTime.now + @day_shift
@@ -11,7 +12,6 @@ class MainpageController < ApplicationController
     @all_menus.push(get_hertsi_menu)
     @all_menus.push(get_juvenes_menu(60038, [77, 3]))
     @all_menus.push(get_juvenes_menu(6, [60, 86]))
-
     # @json = res.body
     
   end
@@ -129,4 +129,27 @@ class MainpageController < ApplicationController
     res = Net::HTTP.get_response(URI.parse(uri_string))
     return JSON.parse(res.body)
   end
+
+  def update_view_count
+    read_view_count
+    today = {'count' => @viewCount['today']['count']} rescue today = {'count' => 0}
+    today['count'] = DateTime.parse(@viewCount['last_hit'].to_json).today? ? today['count'] + 1 : 1
+    @viewCount = {'last_hit' => DateTime.now, 'count' =>  @viewCount['count'] +1, 'today' => today }
+    write_view_count
+  end
+  def write_view_count
+    File.open("viewcount.json",'w') do |line|
+      line.puts(@viewCount.to_json)
+    end
+  end
+  def read_view_count
+    begin
+      File.open("viewcount.json").each do |line|
+        @viewCount = JSON.parse(line)
+      end
+    rescue 
+      @viewCount = {'last_hit' => DateTime.now, 'count' =>  0, 'today' => {'count' => 0} }
+    end
+  end
+
 end
