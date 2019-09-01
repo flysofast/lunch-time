@@ -6,7 +6,7 @@ class MainpageController < ApplicationController
     update_view_count
     @day_shift = params[:day_shift].to_i || 0
     # @language = params[:language] || 'fi'
-    @date = DateTime.now.in_time_zone("Helsinki") + @day_shift
+    @date = DateTime.now + @day_shift
     @all_menus = []
     @all_menus.push(get_reaktori_menu)
     @all_menus.push(get_hertsi_menu)
