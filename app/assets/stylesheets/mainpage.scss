@@ -2,8 +2,8 @@
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
 #header {
-    position: sticky;
-    position: -webkit-sticky;
+    position: fixed;
+    width: 100%;
     top: 0;
     background: white;
     text-align: center;
@@ -28,6 +28,7 @@
     text-align: center;
     width: 96% !important;
     padding-bottom: 1rem;
+    margin-top: 130px;
 
     .restaurant {
         font-size: 0.7em;
